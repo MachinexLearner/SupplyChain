@@ -1,0 +1,226 @@
+{
+  "name": "supply_chain_full_pipeline_v2",
+  "description": "End-to-end supply chain pipeline (v2 - real API data): setup \u2192 ingestion \u2192 transformation \u2192 forecasting. Replace /Workspace/SupplyChain/notebooks/v2 with your actual path.",
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "setup_v2",
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/00_setup_catalog_v2",
+        "source": "WORKSPACE"
+      },
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 0,
+        "data_security_mode": "USER_ISOLATION"
+      }
+    },
+    {
+      "task_key": "usaspending_v2",
+      "depends_on": [
+        {
+          "task_key": "setup_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/01_usaspending_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "fpds_v2",
+      "depends_on": [
+        {
+          "task_key": "usaspending_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/02_fpds_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "subaward_v2",
+      "depends_on": [
+        {
+          "task_key": "fpds_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/03_subaward_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "sam_v2",
+      "depends_on": [
+        {
+          "task_key": "subaward_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/04_sam_entity_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "tariff_v2",
+      "depends_on": [
+        {
+          "task_key": "sam_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/06_tariff_trade_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "commodity_v2",
+      "depends_on": [
+        {
+          "task_key": "tariff_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/07_commodity_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "weather_v2",
+      "depends_on": [
+        {
+          "task_key": "commodity_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/08_weather_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "worldbank_wdi_v2",
+      "depends_on": [
+        {
+          "task_key": "weather_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/09_worldbank_wdi_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "worldbank_wgi_v2",
+      "depends_on": [
+        {
+          "task_key": "worldbank_wdi_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/10_worldbank_wgi_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "nyfed_gscpi_v2",
+      "depends_on": [
+        {
+          "task_key": "worldbank_wgi_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/12_nyfed_gscpi_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "wto_barometer_v2",
+      "depends_on": [
+        {
+          "task_key": "nyfed_gscpi_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/ingestion/13_wto_trade_barometer_ingestion_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "unified_signals_v2",
+      "depends_on": [
+        {
+          "task_key": "wto_barometer_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/transformation/01_unified_demand_signals_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "dod_metrics_v2",
+      "depends_on": [
+        {
+          "task_key": "unified_signals_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/transformation/02_dod_metrics_inputs_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "prophet_v2",
+      "depends_on": [
+        {
+          "task_key": "dod_metrics_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/forecasting/01_prophet_forecasting_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    },
+    {
+      "task_key": "arima_v2",
+      "depends_on": [
+        {
+          "task_key": "dod_metrics_v2"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/SupplyChain/notebooks/v2/forecasting/02_arima_forecasting_v2",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "pipeline_cluster"
+    }
+  ],
+  "job_clusters": [
+    {
+      "job_cluster_key": "pipeline_cluster",
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 1,
+        "data_security_mode": "USER_ISOLATION"
+      }
+    }
+  ]
+}

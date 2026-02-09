@@ -1,0 +1,11 @@
+# Databricks App configuration
+# See: https://docs.databricks.com/dev-tools/databricks-apps/configuration
+command:
+  - "python"
+  - "app.py"
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    description: "SQL Warehouse HTTP path (e.g. /sql/1.0/warehouses/xxxxx)"
+  - name: CATALOG
+    description: "Unity Catalog name"
+    value: "supply_chain"

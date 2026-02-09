@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Secrets / credentials
+.env
+*.key
+credentials.json
+
+# Temp files
+/tmp/
+*.tmp
+
+# Verification results (runtime output)
+verification_results/*.json
+!verification_results/.gitkeep

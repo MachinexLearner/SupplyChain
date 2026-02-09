@@ -1,0 +1,7 @@
+gradio>=4.0
+databricks-sdk
+databricks-sql-connector
+pandas
+numpy
+plotly
+scipy
